@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Timer, CheckCircle, BarChart3, AlertCircle } from 'lucide-react';
+import { Target, Timer, CheckCircle, BarChart3, AlertCircle, RefreshCw } from 'lucide-react';
 import SetupForm from './SetupForm';
+import StartConfirmation from './StartConfirmation';
 import CaseletFlow from './CaseletFlow';
 import BEIFlow from './BEIFlow';
 import StatusPolling from './StatusPolling';
@@ -22,58 +23,6 @@ const Assessment = () => {
     const [jobId, setJobId] = useState(null);
     const [results, setResults] = useState(null);
     const [transitioning, setTransitioning] = useState(false);
-
-    const [hasAutoStarted, setHasAutoStarted] = useState(false);
-
-    useEffect(() => {
-        if (user && user.role === 'participant' && !hasAutoStarted && step === 'setup') {
-            startParticipantSession();
-        }
-    }, [user, step, hasAutoStarted]);
-
-    const startParticipantSession = async () => {
-        setHasAutoStarted(true);
-        setTransitioning(true);
-        try {
-            // Map strings to numeric values as expected by the API
-            const levelMap = {
-                'Level 1': 1,
-                'Level 2': 2,
-                'Level 3': 3,
-                'Level 4': 4,
-                'Level 5': 4 // DigiReady API usually 1-4, clamping 5 to 4
-            };
-
-            const sectionMap = {
-                'Caselet (First your Caselet assessment then BEI)': 34,
-                'BEI Only': 4,
-                'Caselet Only': 3
-            };
-
-            const numericLevel = levelMap[user.level?.split(' - ')[0]] || 1;
-            const numericSection = sectionMap[user.section] || 3;
-
-            const payload = {
-                user_id: user.user_id || `PART-${user.id}`,
-                section: numericSection === 34 ? 3 : numericSection,
-                allocated_seconds: (numericSection === 3 || numericSection === 34) ? 1200 : 1800,
-                level: numericLevel,
-                industry: user.industry || 'General',
-                company: user.company || 'Individual',
-                geography: user.geography || 'India',
-                function: user.function || 'General',
-                division: user.division || 'General',
-                meta: {}
-            };
-
-            const res = await startSession(payload);
-            handleStartSession(res, numericSection, payload.user_id, payload);
-        } catch (err) {
-            console.error('Auto-start failed:', err);
-        } finally {
-            setTransitioning(false);
-        }
-    };
 
     const handleStartSession = (res, selectedSection, originalUserId, formData) => {
         setSessionId(res.session_id);
@@ -152,22 +101,27 @@ const Assessment = () => {
         }
     };
 
-    return (
-        <div className="container">
-            <div className="card fade-in">
-                <header className="header">
-                    <div className="header-title">
-                        <Target size={24} />
-                        <span>DigiReady Assessment</span>
-                    </div>
-                    {sessionId && step === 'active' && (
-                        <div className="timer-container">
-                            {/* Timer component could be injected here */}
-                        </div>
-                    )}
-                </header>
+    const isParticipantSetupOrActive = user?.role === 'participant' && (step === 'setup' || step === 'active' || step === 'polling');
 
-                <main className="content">
+    return (
+        <div className={isParticipantSetupOrActive
+            ? "min-h-screen bg-gradient-to-br from-[#4F46E5] via-[#7C3AED] to-[#DB2777] flex items-center justify-center p-4"
+            : "container"}
+        >
+            <div className={isParticipantSetupOrActive
+                ? "fade-in w-full max-w-5xl"
+                : "card fade-in"}>
+
+                {(!isParticipantSetupOrActive) && (
+                    <header className="header">
+                        <div className="header-title">
+                            <Target size={24} />
+                            <span>DigiReady Assessment</span>
+                        </div>
+                    </header>
+                )}
+
+                <main className={isParticipantSetupOrActive ? "" : "content"}>
                     <AnimatePresence mode="wait">
                         {transitioning && (
                             <motion.div
@@ -189,8 +143,13 @@ const Assessment = () => {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
+                                className="w-full flex justify-center"
                             >
-                                <SetupForm onStart={handleStartSession} />
+                                {user?.role === 'participant' ? (
+                                    <StartConfirmation onStart={handleStartSession} />
+                                ) : (
+                                    <SetupForm onStart={handleStartSession} />
+                                )}
                             </motion.div>
                         )}
 

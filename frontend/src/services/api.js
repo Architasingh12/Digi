@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-export const BASE_URL = 'https://api.digiready.thepotentia.com/';
+export const BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? '/api-external'
+    : 'https://api.digiready.thepotentia.com';
 
 const api = axios.create({
     baseURL: BASE_URL,

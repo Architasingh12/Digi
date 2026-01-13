@@ -76,9 +76,12 @@ const participantLogin = async (req, res) => {
             { expiresIn: '1d' }
         );
 
+        const userData = { ...participant };
+        delete userData.password;
+
         res.json({
             token,
-            user: { id: participant.participant_id, name: `${participant.firstname} ${participant.lastname}`, email: participant.email, role: 'participant' }
+            user: { ...userData, id: participant.participant_id, name: `${participant.firstname} ${participant.lastname}`, role: 'participant' }
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
