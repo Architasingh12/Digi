@@ -1,0 +1,8 @@
+[2026-01-13T00:34:50.826Z] --- Create Company Request ---
+[2026-01-13T00:34:50.829Z] Body: {"firstname":"archita","lastname":"singh","company_title":"frounder","email":"architasingh236@gmail.com","phone":"7367855511","country_code":"+91","password":"archita23","license_qty":10,"expiry_date":"1999-06-08","status":true}
+[2026-01-13T00:34:50.983Z] Attempting to create company with expiry: 1999-06-08
+[2026-01-13T00:34:51.026Z] Success: Company created with ID 2
+[2026-01-13T01:03:16.241Z] --- Create Company Request ---
+[2026-01-13T01:03:16.250Z] Body: {"firstname":"priya","lastname":"singh","company_title":"Founder","email":"priyay89@gmail.com","phone":"4515610351","country_code":"+91","password":"priya123","license_qty":10,"expiry_date":"2026-01-23","status":true}
+[2026-01-13T01:03:16.437Z] Attempting to create company with expiry: 2026-01-23
+[2026-01-13T01:03:16.469Z] Success: Company created with ID 3

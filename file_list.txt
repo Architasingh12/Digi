@@ -1,0 +1,2 @@
+﻿C:\Users\archi\OneDrive\Documents\DigiReady\src\components
+C:\Users\archi\OneDrive\Documents\DigiReady\src\services
